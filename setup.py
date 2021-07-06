@@ -48,7 +48,7 @@ if __name__ == '__main__':
             description="***",
             long_description=long_description,
             long_description_content_type="text/markdown",
-            url="https://github.com/mnicolas94/propsettings",
+            url="https://github.com/mnicolas94/***",
             packages=['***'],
             install_requires=[
                 '***'
