@@ -16,6 +16,14 @@ def get_last_version():
     return version
 
 
+def current_commit_has_tag():
+    bash_command = "git describe --tags --exact-match HEAD"
+    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    has_tag = output != b""
+    return has_tag
+
+
 def bump_patch(version: str):
     major, minor, patch = version.split('.')
     bumped = str(int(patch) + 1)
@@ -32,11 +40,14 @@ def push_new_version_as_tag(version):
 
 
 if __name__ == '__main__':
-    last_version = get_last_version()
-    version = bump_patch(last_version)
+    version = get_last_version()
+    commit_has_tag = current_commit_has_tag()
+    if not commit_has_tag:
+        version = bump_patch(version)
 
     if sys.argv[1] == 'pushtag':
-        push_new_version_as_tag(version)
+        if not commit_has_tag:
+            push_new_version_as_tag(version)
     else:
         with open("README.md", "r") as fh:
             long_description = fh.read()
