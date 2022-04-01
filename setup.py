@@ -4,6 +4,17 @@ import subprocess
 import sys
 
 
+def exists_version():
+    bash_command = "git describe --tags --abbrev=0 --match v[0-9]*"
+    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    outputstr = str(output)
+    outputstr = outputstr[3:-3]  # "b'vXX.XX.XX\\n'" becomes "XX.XX.XX"
+    outputstr = outputstr.replace('-', '.')
+    exists = outputstr != ""
+    return exists
+
+
 def get_last_version():
     bash_command = "git describe --tags --abbrev=0 --match v[0-9]*"
     process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
@@ -11,12 +22,8 @@ def get_last_version():
     outputstr = str(output)
     outputstr = outputstr[3:-3]  # "b'vXX.XX.XX\\n'" becomes "XX.XX.XX"
     outputstr = outputstr.replace('-', '.')
-    exists_version = outputstr != ""
-    if exists_version:
-        major, minor, patch, *_ = outputstr.split('.')
-        ver = f'{major}.{minor}.{patch}'
-    else:
-        ver = "0.1.0"
+    major, minor, patch, *_ = outputstr.split('.')
+    ver = f'{major}.{minor}.{patch}'
     return ver
 
 
@@ -44,13 +51,14 @@ def push_new_version_as_tag(version):
 
 
 if __name__ == '__main__':
-    version = get_last_version()
-    commit_has_tag = current_commit_has_tag()
-    if not commit_has_tag:
+    exists = exists_version()
+    version = get_last_version() if exists else "0.1.0"
+    already_has_version = current_commit_has_tag()
+    if not already_has_version and exists:
         version = bump_patch(version)
 
     if sys.argv[1] == 'pushtag':
-        if not commit_has_tag:
+        if not already_has_version:
             push_new_version_as_tag(version)
     else:
         with open("README.md", "r") as fh:
