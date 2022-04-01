@@ -11,9 +11,13 @@ def get_last_version():
     outputstr = str(output)
     outputstr = outputstr[3:-3]  # "b'vXX.XX.XX\\n'" becomes "XX.XX.XX"
     outputstr = outputstr.replace('-', '.')
-    major, minor, patch, *_ = outputstr.split('.')
-    version = f'{major}.{minor}.{patch}'
-    return version
+    exists_version = outputstr != ""
+    if exists_version:
+        major, minor, patch, *_ = outputstr.split('.')
+        ver = f'{major}.{minor}.{patch}'
+    else:
+        ver = "0.1.0"
+    return ver
 
 
 def current_commit_has_tag():
@@ -24,8 +28,8 @@ def current_commit_has_tag():
     return has_tag
 
 
-def bump_patch(version: str):
-    major, minor, patch = version.split('.')
+def bump_patch(ver: str):
+    major, minor, patch = ver.split('.')
     bumped = str(int(patch) + 1)
     return f'{major}.{minor}.{bumped}'
 
