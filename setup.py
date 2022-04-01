@@ -1,4 +1,5 @@
 import setuptools
+from setuptools import find_packages
 import subprocess
 import sys
 
@@ -49,7 +50,7 @@ if __name__ == '__main__':
             long_description=long_description,
             long_description_content_type="text/markdown",
             url="https://github.com/mnicolas94/***",
-            packages=['***'],
+            packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
             install_requires=[
                 '***'
             ],
